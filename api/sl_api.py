@@ -16,7 +16,7 @@ class SLApi:
             return self.handle_success(req.json())
         elif retry < 2:
             retry += 1
-            return self.get_next_departure(retry)
+            return self.get_next_departures(retry)
         return req.raise_for_status()
 
     def _build_departure_query(self, id, duration, products):
@@ -31,10 +31,10 @@ class SLApi:
         return '&'.join([id, duration, pageSize, passList, language, format, products])
 
     def handle_success(self, data):
-        depratures = data['Departure']
+        departures = data['Departure']
 
         res = []
-        for departure in depratures:
+        for departure in departures:
             res.append({'time': departure['time'], 'direction': departure['direction']})
 
         return res 
