@@ -1,3 +1,4 @@
+from datetime import datetime
 import requests
 
 ONLY_SUBWAY = 32
@@ -35,7 +36,8 @@ class SLApi:
 
         res = []
         for departure in departures:
-            res.append({'time': departure['time'], 'direction': departure['direction']})
+            timestampAsTime = datetime.strptime(departure['time'], "%H:%M:%S").time()
+            res.append({'time': timestampAsTime.strftime("%H:%M"), 'direction': departure['direction']})
 
         return res 
 
