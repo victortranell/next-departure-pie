@@ -32,6 +32,9 @@ class SLApi:
         return '&'.join([id, duration, pageSize, passList, language, format, products])
 
     def handle_success(self, data):
+        if 'Departure' not in data:
+            return []
+
         departures = data['Departure']
 
         res = []
