@@ -1,4 +1,5 @@
 from datetime import datetime
+from time import sleep
 import requests
 
 ONLY_SUBWAY = 32
@@ -12,13 +13,16 @@ class SLApi:
 
     def get_next_departures(self, retry = 0):
         req = requests.get(self.base_url + 'departureBoard?' + self._build_departure_query(self.departure_id, 30, ONLY_SUBWAY) + '&accessId=' + self.key)
-
         if (req.status_code == 200):
             return self.handle_success(req.json())
-        elif retry < 2:
+        elif retry < 10:
             retry += 1
+            sleep( self.get_exponential_backoff(retry))
             return self.get_next_departures(retry)
         return req.raise_for_status()
+
+    def get_exponential_backoff(self, retry):
+        return 10 * (2**retry)
 
     def _build_departure_query(self, id, duration, products):
         id = 'id=' + str(id)
