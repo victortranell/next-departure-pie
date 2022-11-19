@@ -3,16 +3,17 @@ from time import sleep
 import requests
 
 ONLY_SUBWAY = 32
+ONLY_BUS = 128
 
 class SLApi:
-    departure_id = 740021670 # id of station
+    departure_id = 740046180 # id of station
 
     def __init__(self, key):
         self.key = key
         self.base_url = 'https://api.resrobot.se/v2.1/'
 
     def get_next_departures(self, retry = 0):
-        req = requests.get(self.base_url + 'departureBoard?' + self._build_departure_query(self.departure_id, 30, ONLY_SUBWAY) + '&accessId=' + self.key)
+        req = requests.get(self.base_url + 'departureBoard?' + self._build_departure_query(self.departure_id, 30, ONLY_BUS) + '&accessId=' + self.key)
         if (req.status_code == 200):
             return self.handle_success(req.json())
         elif retry < 10:
