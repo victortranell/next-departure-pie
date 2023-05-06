@@ -12,15 +12,20 @@ class SLApi:
         self.key = key
         self.base_url = 'https://api.resrobot.se/v2.1/'
 
-    def get_next_departures(self, retry = 0):
-        req = requests.get(self.base_url + 'departureBoard?' + self._build_departure_query(self.departure_id, 30, ONLY_BUS) + '&accessId=' + self.key)
-        if (req.status_code == 200):
-            return self.handle_success(req.json())
-        elif retry < 10:
+    def get_next_departures(self, retry=0):
+        try:
+            req = requests.get(self.base_url + 'departureBoard?' + self._build_departure_query(self.departure_id, 30, ONLY_BUS) + '&accessId=' + self.key)
+            if req.status_code == 200:
+                return self.handle_success(req.json())
+        except requests.exceptions.ConnectionError:
+            pass
+
+        if retry < 14:
             retry += 1
-            sleep( self.get_exponential_backoff(retry))
+            sleep(self.get_exponential_backoff(retry))
             return self.get_next_departures(retry)
-        return req.raise_for_status()
+        else:
+            raise requests.exceptions.ConnectionError("Maximum retries exceeded.")
 
     def get_exponential_backoff(self, retry):
         return 10 * (2**retry)
